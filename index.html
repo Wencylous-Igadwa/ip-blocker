@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>I Come Bearing Gifts</title>
+  <style>
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      text-align: center; 
+      margin: 0; 
+      padding: 0;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      color: #333;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #555;
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      max-width: 600px;
+    }
+    #scrambleBtn {
+      background-color: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+    #scrambleBtn:hover {
+      background-color: #ff4757;
+    }
+    #giftsContainer {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .gift-option { 
+      background: white;
+      padding: 20px 30px;
+      border-radius: 15px;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      width: 220px;
+      height: 120px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+    .gift-option:hover {
+      transform: scale(1.05);
+      background-color: #ffe9e3;
+    }
+    .hidden { 
+      display: none; 
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<h1>I Come Bearing Gifts 🎁</h1>
+<p>"I come bearing gifts" means arriving with presents or offering something positive and generous.</p>
+
+<button id="scrambleBtn">🎲 Scramble Gifts!</button>
+
+<div id="giftsContainer" class="hidden"></div>
+
+<script>
+  const gifts = ["Smocha", "Bugger", "Yoghurt"];
+  const scrambleBtn = document.getElementById('scrambleBtn');
+  const giftsContainer = document.getElementById('giftsContainer');
+
+  // Check if already selected (localStorage browser block)
+  if (localStorage.getItem('giftTaken')) {
+    document.body.innerHTML = "<h1>Access Denied ❌</h1><p>You have already claimed your gift.</p>";
+  }
+
+  scrambleBtn.addEventListener('click', () => {
+    // Shuffle gifts
+    const shuffled = gifts.sort(() => Math.random() - 0.5);
+
+    // Show gift options
+    giftsContainer.innerHTML = '';
+    shuffled.forEach((gift, index) => {
+      const giftDiv = document.createElement('div');
+      giftDiv.className = 'gift-option';
+      giftDiv.textContent = `🎁 Gift ${index + 1}`;
+      giftDiv.onclick = () => selectGift(giftDiv, gift);
+      giftsContainer.appendChild(giftDiv);
+    });
+
+    giftsContainer.classList.remove('hidden');
+    scrambleBtn.disabled = true;
+  });
+
+  function selectGift(selectedDiv, gift) {
+    const options = document.querySelectorAll('.gift-option');
+    options.forEach(opt => opt.onclick = null); // disable all clicks
+
+    selectedDiv.innerHTML = `🎉 Congratulations!<br>${gift}`;
+
+    // Save to localStorage
+    localStorage.setItem('giftTaken', true);
+
+    // Notify server to block IP
+    fetch('blocker.php?block=1');
+
+    // Close after 3 seconds
+    setTimeout(() => {
+      window.open('', '_self', '');
+      window.close();
+    }, 3000);
+  }
+</script>
+
+</body>
+</html>
